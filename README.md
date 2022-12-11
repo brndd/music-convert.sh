@@ -14,11 +14,11 @@ The script performs the transcode using [GNU parallel](https://www.gnu.org/softw
 
 ## Dependencies
 
-- metaflac (Fedora package: `flac`)
-- opusenc (Fedora package: `opus-tools`)
-- exiftool (Fedora package: `perl-Image-ExifTool`)
-- convert from ImageMagick (Fedora package: `ImageMagick`)
-- parallel (Fedora package: `parallel`)
+- **metaflac** (Fedora package: `flac`)
+- **opusenc** (Fedora package: `opus-tools`)
+- **exiftool** (Fedora package: `perl-Image-ExifTool`)
+- **convert** from ImageMagick (Fedora package: `ImageMagick`)
+- **parallel** (Fedora package: `parallel`)
 
 ## Usage
 
