@@ -26,15 +26,13 @@ if ! command -v parallel &> /dev/null; then
     exit 1
 fi
 
-# Parse arguments using getopt
-#PARSED_ARGUMENTS=$(getopt -n music-convert.sh -o pj: --long progress,jobs: -- "$@")
-
-jobs=8
-progress=true
-
 print_usage() {
     echo "Usage: $(basename $0) [-h] [-v] [-q] [-j jobs] /path/to/input/flacs /path/to/output/opuses"
 }
+
+#Default values for command line options
+jobs=8
+progress=true
 
 while getopts ':qj:hv' opt; do
     case "$opt" in
