@@ -11,7 +11,7 @@ find_art () {
     albumartist=$(escape_regex "$albumartist")
     albumname=$(printf '%s\n' "$1" | grep "Album:" | sed -n "s/^.*Album:\s*\(.*\)$/\1/p")
     albumname=$(escape_regex "$albumname")
-    coverart=$(find "$2" -maxdepth 1 -regextype egrep -regex ".*/(cover|folder|$albumartist.*$albumname)\.(jpe?g|png)" -print -quit)
+    coverart=$(find "$2" -maxdepth 1 -regextype egrep -iregex ".*/(cover|folder|$albumartist.*$albumname)\.(jpe?g|png)" -print -quit)
     printf '%s' "$coverart"
 }
 
