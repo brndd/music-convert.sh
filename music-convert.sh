@@ -24,12 +24,16 @@ if ! command -v opusenc &> /dev/null; then
     echo "opusenc is not installed. Aborting."
     exit 1
 fi
+if ! command -v exiftool &> /dev/null; then
+    echo "exiftool is not installed. Aborting."
+    exit 1
+fi
 if ! command -v convert &> /dev/null; then
     echo "ImageMagick (convert) is not installed. Aborting."
     exit 1
 fi
 if ! command -v parallel &> /dev/null; then
-    echo "GNU parallel is not installed. Aborting."
+    echo "parallel is not installed. Aborting."
     exit 1
 fi
 
