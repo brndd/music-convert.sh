@@ -80,7 +80,7 @@ find "$flac_dir" -name "*.flac" | while read flac_file; do
     mkdir -p "$opus_file_dir"
     exif=$(exiftool -S "$flac_file")
 
-    coverart_path=""
+    opusenc_command="opusenc --quiet --discard-pictures --bitrate 96 --downmix-stereo"
 
     if ! [[ $(printf '%s\n' "$exif" | grep "Picture:") ]]; then
         #If there is no embedded album art, check if there's a (cover|albumartist.?album).(jpe?g|png)
@@ -94,7 +94,7 @@ find "$flac_dir" -name "*.flac" | while read flac_file; do
                 convert -define jpeg:extent=100KB -resize 500x500\> "$coverart" "$new_cover_file"
             fi
             #Embed the file
-            coverart_path="$new_cover_file"
+            opusenc_command="$opusenc_command --picture \"${new_cover_file}\""
         fi
     else
         #If there is embedded album art, make it smaller if it's large (>100 KB), and extract it to be next to the files if needed.
@@ -117,27 +117,18 @@ find "$flac_dir" -name "*.flac" | while read flac_file; do
         converted_art_file="$extracted_art_dir/small.jpg"
         mkdir -p "$extracted_art_dir"
         metaflac --export-picture-to="$extracted_art_file" "$flac_file"
-        if (( artsize > 100000 )); then # Gyaa~! It's so big~!
-            convert -define jpeg:extent=100KB -resize 500x500\> "$extracted_art_file" "$converted_art_file"
-            
-            #Stick the converted file in the dir if there's no cover yet
-            if [[ ! -e "$new_cover_file" ]]; then
-                cp "$converted_art_file" "$new_cover_file"
-            fi
+
+        #Convert -- this will only change the file it if it's larger than 100 KB, otherwise it's a copy
+        convert -define jpeg:extent=100KB -resize 500x500\> "$extracted_art_file" "$converted_art_file"
+        #Stick the converted file in the dir if there's no cover yet
+        if [[ ! -e "$new_cover_file" ]]; then
+            cp "$converted_art_file" "$new_cover_file"
         fi
         #Finally, embed the file
-        coverart_path="$converted_art_file"
+        opusenc_command="$opusenc_command --picture \"$new_cover_file\""
     fi
-    if [[ -n "$coverart_path" ]]; then
-        printf '%s\0' "--picture"
-        printf '%s\0' "$coverart_path"
-    else
-        printf ''
-        printf ''
-    fi 
-    printf '%s\0' "$flac_file"
-    printf '%s\0' "$opus_file"
+    printf '%s "%s" "%s"\0' "$opusenc_command" "$flac_file" "$opus_file"
 done |
-parallel -j 8 --bar --trim lr -N 4 -0 opusenc --quiet --discard-pictures --bitrate 96 --downmix-stereo {}
+parallel --bar -j 8 -0 {}
 
 rm -rf "/tmp/musicconvert"
