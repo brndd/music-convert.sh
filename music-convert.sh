@@ -2,6 +2,8 @@
 set -euo pipefail
 shopt -s extglob
 
+VERSION="0.5"
+
 # Check dependencies
 if ! command -v metaflac &> /dev/null; then
     echo "metaflac is not installed. Aborting."
@@ -23,6 +25,61 @@ if ! command -v parallel &> /dev/null; then
     echo "parallel is not installed. Aborting."
     exit 1
 fi
+
+# Parse arguments using getopt
+#PARSED_ARGUMENTS=$(getopt -n music-convert.sh -o pj: --long progress,jobs: -- "$@")
+
+jobs=8
+progress=true
+
+print_usage() {
+    echo "Usage: $(basename $0) [-h] [-v] [-q] [-j jobs] /path/to/input/flacs /path/to/output/opuses"
+}
+
+while getopts ':qj:hv' opt; do
+    case "$opt" in
+        q)
+            progress=false
+            ;;
+        j)
+            if [[ $OPTARG != ?(-)+([0-9]) ]]; then
+                echo "jobs parameter must be an integer."
+                exit 1
+            fi
+            jobs="$OPTARG"
+            ;;
+
+        h)
+            print_usage
+            echo ""
+            echo "Options:"
+            echo "  -h         display this help text and exit"
+            echo "  -v         display version and exit"
+            echo "  -q         quiet output (do not show GNU parallel progress bar)"
+            echo "  -j <jobs>  number of threads to use for transcoding (default: 8)"
+            exit 0
+            ;;
+        
+        v)
+            echo "music-convert.sh version $VERSION"
+            exit 0
+            ;;
+
+        :)
+            echo "option that expected an argument received no argument."
+            exit 1
+            ;;
+        
+        ?)
+            echo -e "Invalid option."
+            print_usage
+            exit 1
+            ;;
+    esac
+done
+
+#Shift args by the number of options
+shift "$(($OPTIND - 1))"
 
 #Check params
 if [[ "$#" -lt 2 ]]; then
@@ -141,7 +198,15 @@ convert_file() {
 }
 export -f convert_file
 
+#Compose parallel invocation
+parallel_cmd=(parallel -0)
+if [ "$progress" = true ]; then
+    parallel_cmd+=(--bar)
+fi
+parallel_cmd+=(-j $jobs)
+parallel_cmd+=(convert_file)
 
-find "$flac_dir" -name "*.flac" -print0 | parallel --bar -0 -j 8 convert_file
+#Find and convert
+find "$flac_dir" -name "*.flac" -print0 | "${parallel_cmd[@]}"
 
 rm -rf "/tmp/musicconvert"
