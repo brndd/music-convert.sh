@@ -20,6 +20,10 @@ The script executes using GNU parallel. Right now the thread count is hardcoded 
 - convert from ImageMagick (Fedora package: `ImageMagick`)
 - parallel (Fedora package: `parallel`)
 
+## Usage
+
+`./media-convert.sh /path/to/input/flacs /path/to/output/opuses`
+
 ## Future plans
 
 - Support other files than FLAC (my collection may have a handful of MP3s etc.), avoiding lossy->lossy transcodes
