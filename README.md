@@ -11,3 +11,10 @@ Embedded album art is also preserved in the files.
 Both embedded art and the separate cover art are compressed with ImageMagick to have a smaller (<100 KB) footprint.
 
 The script executes using GNU parallel. Right now the thread count is hardcoded to 8 but I'll change that tomorrow unless I forget.
+
+## Future plans
+
+- Support other files than FLAC (my collection may have a handful of MP3s etc.), avoiding lossy->lossy transcodes
+- Add better command line parameters.
+- Turn this thing into a daemon that uses inotify to watch the collection folder for updates and transcodes new/modified files
+  on the fly. (Something like this probably exists already.)
