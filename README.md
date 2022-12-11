@@ -29,5 +29,8 @@ For command line options, see `./media-convert.sh -h`.
 ## Future plans
 
 - Support other files than FLAC (my collection may have a handful of MP3s etc.), avoiding lossy->lossy transcodes
+  - Easiest way to do this would be to use ffmpeg, but ffmpeg is currently very deficient when it comes to embedding album art into Opus files.
+  - Workaround would probably be something ugly like decoding the input file into a WAV using ffmpeg, then encoding that using opusenc.
+    Not very nice and would likely be slow.
 - Turn this thing into a daemon that uses inotify to watch the collection folder for updates and transcodes new/modified files
   on the fly. (Something like this probably exists already.)
