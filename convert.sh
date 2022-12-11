@@ -134,6 +134,6 @@ find "$flac_dir" -name "*.flac" | while read flac_file; do
     printf '%s\0' "$flac_file"
     printf '%s\0' "$opus_file"
 done |
-parallel --bar --trim lr -N 4 -0 opusenc --quiet --discard-pictures --bitrate 96 --downmix-stereo {}
+parallel -j 8 --bar --trim lr -N 4 -0 opusenc --quiet --discard-pictures --bitrate 96 --downmix-stereo {}
 
 rm -rf "/tmp/musicconvert"
