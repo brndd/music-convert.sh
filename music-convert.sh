@@ -72,7 +72,7 @@ fi
 find "$flac_dir" -name "*.flac" | while read flac_file; do
     flac_file_noext="${flac_file%.*}"
     flac_file_dir=$(dirname "$flac_file")
-    opus_file="$opus_dir/${flac_file_noext#$flac_dir/}.opus"
+    opus_file="$opus_dir/${flac_file_noext#$(printf '%q' "$flac_dir")/}.opus"
     #If the transcoded file already exists, we don't need to do anything
     if [[ -e "$opus_file" ]]; then continue; fi
 
