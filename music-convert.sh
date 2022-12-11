@@ -60,7 +60,7 @@ if [[ -e "$temp_dir" ]]; then
 fi
 
 file_count=$(find "$flac_dir" -name "*.flac" | wc -l)
-echo "This will convert $file_count FLACs from $flac_dir into $opus_dir."
+echo "This will convert up to $file_count FLACs from $flac_dir into $opus_dir."
 read -p "Are you sure? (y/N) " -n 1 -r
 echo  
 if [[ ! $REPLY =~ ^[Yy]$ ]]
