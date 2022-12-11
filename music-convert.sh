@@ -97,7 +97,7 @@ fi
 export opus_dir=$(realpath "$2")
 export temp_dir="/tmp/musicconvert"
 if [[ -e "$temp_dir" ]]; then
-    echo "Temporary directory \(${temp_dir}\) already exists, exiting."
+    echo "Temporary directory (${temp_dir}) already exists, exiting."
     exit 1
 fi
 
