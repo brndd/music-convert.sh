@@ -12,6 +12,14 @@ Both embedded art and the separate cover art are compressed with ImageMagick to 
 
 The script executes using GNU parallel. Right now the thread count is hardcoded to 8 but I'll change that tomorrow unless I forget.
 
+## Dependencies
+
+- metaflac (Fedora package: `flac`)
+- opusenc (Fedora package: `opus-tools`)
+- exiftool (Fedora package: `perl-Image-ExifTool`)
+- convert from ImageMagick (Fedora package: `ImageMagick`)
+- parallel (Fedora package: `parallel`)
+
 ## Future plans
 
 - Support other files than FLAC (my collection may have a handful of MP3s etc.), avoiding lossy->lossy transcodes
