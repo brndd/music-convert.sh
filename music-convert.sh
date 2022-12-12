@@ -31,7 +31,7 @@ print_usage() {
 }
 
 #Default values for command line options
-jobs=8
+jobs="100%"
 progress=true
 confirm=true
 
@@ -55,7 +55,7 @@ while getopts ':qj:hvy' opt; do
             echo "  -h         display this help text and exit"
             echo "  -v         display version and exit"
             echo "  -q         quiet output (do not show GNU parallel progress bar)"
-            echo "  -j <jobs>  number of threads to use for transcoding (default: 8)"
+            echo "  -j <jobs>  number of threads to use for transcoding (default: system core count)"
             echo "  -y         skip confirm prompt"
             exit 0
             ;;
@@ -209,7 +209,7 @@ parallel_cmd=(parallel -0)
 if [ "$progress" = true ]; then
     parallel_cmd+=(--bar)
 fi
-parallel_cmd+=(-j $jobs)
+parallel_cmd+=(-j "$jobs")
 parallel_cmd+=(convert_file)
 
 #Find and convert
