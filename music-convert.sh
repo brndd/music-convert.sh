@@ -27,14 +27,15 @@ if ! command -v parallel &> /dev/null; then
 fi
 
 print_usage() {
-    echo "Usage: $(basename $0) [-h] [-v] [-q] [-j jobs] /path/to/input/flacs /path/to/output/opuses"
+    echo "Usage: $(basename $0) [-h] [-v] [-q] [-j jobs] [-y] /path/to/input/flacs /path/to/output/opuses"
 }
 
 #Default values for command line options
 jobs=8
 progress=true
+confirm=true
 
-while getopts ':qj:hv' opt; do
+while getopts ':qj:hvy' opt; do
     case "$opt" in
         q)
             progress=false
@@ -55,12 +56,17 @@ while getopts ':qj:hv' opt; do
             echo "  -v         display version and exit"
             echo "  -q         quiet output (do not show GNU parallel progress bar)"
             echo "  -j <jobs>  number of threads to use for transcoding (default: 8)"
+            echo "  -y         skip confirm prompt"
             exit 0
             ;;
         
         v)
             echo "music-convert.sh version $VERSION"
             exit 0
+            ;;
+        
+        y)
+            confirm=false
             ;;
 
         :)
@@ -101,14 +107,16 @@ if [[ -e "$temp_dir" ]]; then
     exit 1
 fi
 
-file_count=$(find "$flac_dir" -name "*.flac" | wc -l)
-echo "This will convert up to $file_count FLACs from $flac_dir into $opus_dir."
-read -p "Are you sure? (y/N) " -n 1 -r
-echo  
-if [[ ! $REPLY =~ ^[Yy]$ ]]
-then
-    echo "Aborting."
-    exit 1
+if [ "$confirm" = true ]; then
+    file_count=$(find "$flac_dir" -name "*.flac" | wc -l)
+    echo "This will convert up to $file_count FLACs from $flac_dir into $opus_dir."
+    read -p "Are you sure? (y/N) " -n 1 -r
+    echo  
+    if [[ ! $REPLY =~ ^[Yy]$ ]]
+    then
+        echo "Aborting."
+        exit 1
+    fi
 fi
 
 convert_file() {
