@@ -12,6 +12,9 @@ Both embedded art and the separate cover art are compressed with ImageMagick to 
 
 The script performs the transcode using [GNU parallel](https://www.gnu.org/software/parallel/).
 
+Opusenc applies per-track replaygain as it encodes, but you will probably want to use [r128gain](https://github.com/desbma/r128gain)
+to add album gain to the converted files once you're done.
+
 ## Dependencies
 
 - **metaflac** (Fedora package: `flac`)
