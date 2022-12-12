@@ -2,7 +2,7 @@
 set -euo pipefail
 shopt -s extglob
 
-VERSION="0.5"
+VERSION="0.5.1"
 
 # Check dependencies
 if ! command -v metaflac &> /dev/null; then
