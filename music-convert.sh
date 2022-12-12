@@ -138,7 +138,7 @@ convert_file() {
     flac_file_dir=$(dirname "$flac_file")
     opus_file="$opus_dir/${flac_file_noext#$(printf '%q' "$flac_dir")/}.opus"
     #If the transcoded file already exists, we don't need to do anything
-    if [[ -e "$opus_file" ]]; then continue; fi
+    if [[ -e "$opus_file" ]]; then return; fi
 
     opus_file_dir=$(dirname "$opus_file")
     mkdir -p "$opus_file_dir"
