@@ -2,7 +2,7 @@
 set -euo pipefail
 shopt -s extglob
 
-VERSION="0.5.1"
+VERSION="0.6.0"
 
 # Check dependencies
 if ! command -v metaflac &> /dev/null; then
@@ -17,8 +17,8 @@ if ! command -v exiftool &> /dev/null; then
     echo "exiftool is not installed. Aborting."
     exit 1
 fi
-if ! command -v convert &> /dev/null; then
-    echo "ImageMagick (convert) is not installed. Aborting."
+if ! command -v magick &> /dev/null; then
+    echo "ImageMagick is not installed. Aborting."
     exit 1
 fi
 if ! command -v parallel &> /dev/null; then
@@ -101,11 +101,7 @@ if [[ ! -e "$flac_dir" ]]; then
 fi
 
 export opus_dir=$(realpath "$2")
-export temp_dir="/tmp/musicconvert"
-if [[ -e "$temp_dir" ]]; then
-    echo "Temporary directory (${temp_dir}) already exists, exiting."
-    exit 1
-fi
+export temp_dir=$(mktemp -d)
 
 if [ "$confirm" = true ]; then
     file_count=$(find "$flac_dir" -name "*.flac" | wc -l)
@@ -157,7 +153,7 @@ convert_file() {
                 (
                     flock -x -w 10 200 #Lock the file so we don't race
                     if [[ ! -e "$new_cover_file" ]]; then
-                        convert -define jpeg:extent=100KB -resize 500x500\> "$coverart" "$new_cover_file"
+                        magick "$coverart" -define jpeg:extent=100KB -resize 500x500\> "$new_cover_file"
                     fi
                 ) 200>"/run/user/$UID/musicconvert-$(cksum <<< $flac_file_dir | cut -f 1 -d ' ')-cover.lock"
                 #Embed the file
@@ -172,7 +168,7 @@ convert_file() {
             (
                 flock -x -w 10 200
                 if [[ ! -e "$new_cover_file" ]]; then
-                    convert -define jpeg:extent=100KB -resize 500x500\> "$coverart" "$new_cover_file"
+                    magick "$coverart" -define jpeg:extent=100KB -resize 500x500\> "$new_cover_file"
                 fi
             ) 200>"/run/user/$UID/musicconvert-$(cksum <<< $flac_file_dir | cut -f 1 -d ' ')-cover.lock"
             #no need to embed it here since there is embedded art already
@@ -188,7 +184,7 @@ convert_file() {
         metaflac --export-picture-to="$extracted_art_file" "$flac_file"
 
         #Convert -- this will only change the file it if it's larger than 100 KB, otherwise it's a copy
-        convert -define jpeg:extent=100KB -resize 500x500\> "$extracted_art_file" "$converted_art_file"
+        magick "$extracted_art_file" -define jpeg:extent=100KB -resize 500x500\> "$converted_art_file"
         #Stick the converted file in the dir if there's no cover yet
         (
             flock -x -w 10 200
@@ -215,4 +211,4 @@ parallel_cmd+=(convert_file)
 #Find and convert
 find "$flac_dir" -name "*.flac" -print0 | "${parallel_cmd[@]}"
 
-rm -rf "/tmp/musicconvert"
+rm -rf "$temp_dir"
